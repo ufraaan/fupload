@@ -8,7 +8,6 @@
   --muted: #737373;
   --border: #e5e5e5;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-  --font-pixel: var(--font-geist-pixel-square), var(--font-mono);
 }
 
 body {
@@ -18,7 +17,7 @@ body {
 }
 
 .font-pixel {
-  font-family: var(--font-pixel);
+  font-family: var(--font-geist-pixel-line), var(--font-mono);
 }
 
 /* Minimal overrides for UploadThing button to match our theme */

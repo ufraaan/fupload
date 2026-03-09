@@ -4,8 +4,8 @@ import { UploadButton } from "@/app/utils/uploadthing";
 import { useState } from "react";
 import type { UploadThingError } from "@uploadthing/shared";
 
-const SITE_NAME = "Fupload";
-const TAGLINE = "Drop a file. Get a shareable link. No account needed.";
+const SITE_NAME = "fupload";
+const TAGLINE = "Drop a file. Get a shareable link.";
 const ALLOWED_DESCRIPTION = "One file.";
 
 function getFriendlyErrorMessage(raw: string): string {
@@ -82,7 +82,7 @@ export default function Home() {
     <main className="min-h-screen flex flex-col bg-[var(--page-bg)]">
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-12 sm:py-16">
         <header className="w-full max-w-[420px] text-center mb-10">
-          <h1 className="font-pixel text-[56px] sm:text-[72px] font-medium text-[var(--fg)] tracking-tight mb-2">
+          <h1 className="font-pixel text-[80px] sm:text-[112px] font-medium text-[var(--fg)] tracking-tight mb-2">
             {SITE_NAME}
           </h1>
           <p className="text-[13px] text-[var(--muted)] leading-relaxed">

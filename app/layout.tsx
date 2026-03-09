@@ -2,10 +2,10 @@ import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { extractRouterConfig } from "uploadthing/server";
 import { ourFileRouter } from "@/app/api/uploadthing/core";
 import { GeistMono } from "geist/font/mono";
-import { GeistPixelSquare } from "geist/font/pixel";
+import { GeistPixelLine } from "geist/font/pixel";
 import "./globals.css";
 
-const fontVariables = [GeistMono.variable, GeistPixelSquare.variable].join(" ");
+const fontVariables = [GeistMono.variable, GeistPixelLine.variable].join(" ");
 
 export const metadata = {
   title: "Fupload — Drop a file, get a link",
