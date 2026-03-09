@@ -91,7 +91,7 @@ export default function Home() {
         </header>
 
           <div className="w-full max-w-[420px] flex flex-col items-center mb-6">
-          <div className="w-full rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 sm:p-10 flex flex-col items-center justify-center min-h-[140px] sm:min-h-[160px] transition-colors">
+          <div className="w-full p-6 sm:p-10 flex flex-col items-center justify-center min-h-[140px] sm:min-h-[160px] transition-colors">
             <UploadButton
               endpoint="fileUploader"
               appearance={{
@@ -135,7 +135,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={copy}
-                className="w-full text-[12px] font-medium text-[var(--fg)] py-2 px-4 min-h-[44px] rounded-lg border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--border)]/50 active:bg-[var(--border)] transition-colors focus:outline-none focus:ring-1 focus:ring-[var(--fg)]/20"
+                className="text-[12px] font-medium text-[var(--fg)] py-2 px-6 min-h-[44px] rounded-lg border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--border)]/50 active:bg-[var(--border)] transition-colors focus:outline-none focus:ring-1 focus:ring-[var(--fg)]/20"
               >
                 {copied ? "Copied" : "Copy"}
               </button>
