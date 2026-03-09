@@ -21,7 +21,6 @@ body {
   font-family: var(--font-geist-pixel-line), var(--font-mono);
 }
 
-/* Minimal overrides for UploadThing button to match our theme */
 [data-ut-element="button"] {
   background: var(--fg) !important;
   color: var(--page-bg) !important;
@@ -37,13 +36,15 @@ body {
   cursor: not-allowed;
 }
 
-/* Ensure button label stays above progress bar and is visible */
 [data-ut-element="button"] > span {
   position: relative;
   z-index: 10;
 }
 
-/* Subtle fade-in for success/error messages */
+[data-ut-element="button"][data-state="uploading"]::after {
+  background: #ff0000 !important;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

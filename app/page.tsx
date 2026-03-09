@@ -118,22 +118,24 @@ export default function Home() {
           )}
 
           {url && !error && (
-            <div
-              className={
-                "mt-4 flex items-center justify-between gap-3 rounded-lg border border-[var(--border)] bg-[var(--card)] px-4 py-3 transition-all duration-300 " +
-                (justUploaded ? "ring-1 ring-[var(--fg)]/10" : "")
-              }
-            >
-              <span
-                className="text-[12px] text-[var(--muted)] truncate flex-1 min-w-0"
-                title={url}
+            <div className="mt-4 w-full min-w-0 flex flex-col gap-3">
+              <div
+                className={
+                  "w-full min-w-0 rounded-lg border border-[var(--border)] bg-[var(--card)] px-4 py-3 overflow-hidden " +
+                  (justUploaded ? "ring-1 ring-[var(--fg)]/10" : "")
+                }
               >
-                {url}
-              </span>
+                <span
+                  className="text-[12px] text-[var(--muted)] truncate block min-w-0 w-full"
+                  title={url}
+                >
+                  {url}
+                </span>
+              </div>
               <button
                 type="button"
                 onClick={copy}
-                className="text-[12px] font-medium text-[var(--fg)] flex-shrink-0 py-2 px-3 min-h-[44px] min-w-[60px] flex items-center justify-center rounded hover:bg-[var(--border)]/50 active:bg-[var(--border)] transition-colors focus:outline-none focus:ring-1 focus:ring-[var(--fg)]/20"
+                className="w-full text-[12px] font-medium text-[var(--fg)] py-2 px-4 min-h-[44px] rounded-lg border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--border)]/50 active:bg-[var(--border)] transition-colors focus:outline-none focus:ring-1 focus:ring-[var(--fg)]/20"
               >
                 {copied ? "Copied" : "Copy"}
               </button>
@@ -155,7 +157,7 @@ export default function Home() {
             href="https://uploadthing.com/"
             target="_blank"
             rel="noopener noreferrer"
-            className="underline hover:text-[var(--fg)] transition-colors"
+            className="text-red-500 underline hover:text-red-600 transition-colors"
           >
             uploadthing
           </a>

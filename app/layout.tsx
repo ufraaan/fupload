@@ -8,9 +8,9 @@ import "./globals.css";
 const fontVariables = [GeistMono.variable, GeistPixelLine.variable].join(" ");
 
 export const metadata = {
-  title: "Fupload — Drop a file, get a link",
+  title: "Fupload",
   description:
-    "Upload a file and get a shareable link instantly. No sign-up. Images, PDFs, video, audio, and more.",
+    "Upload a file and get a shareable link instantly.",
 };
 
 export const viewport = {
