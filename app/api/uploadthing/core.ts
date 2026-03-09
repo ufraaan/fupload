@@ -1,10 +1,25 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
 
+function toFriendlyMessage(raw: string): string {
+  const lower = raw.toLowerCase();
+  if (
+    lower.includes("invalid token") ||
+    lower.includes("base64") ||
+    lower.includes("apikey") ||
+    lower.includes("appid") ||
+    lower.includes("missing_env") ||
+    lower.includes("regions")
+  ) {
+    return "Upload isn't available right now. Please try again later or contact the site owner.";
+  }
+  return raw;
+}
+
 const f = createUploadthing({
   errorFormatter: (err) => {
     return {
-      message: err.message,
+      message: toFriendlyMessage(err.message),
       code: err.code,
     };
   },
