@@ -1,26 +1,48 @@
 @import "tailwindcss";
+@import "@uploadthing/react/styles.css";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --page-bg: #fafafa;
+  --card: #ffffff;
+  --fg: #0a0a0a;
+  --muted: #737373;
+  --border: #e5e5e5;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--page-bg);
+  color: var(--fg);
+  font-family: var(--font-mono);
+}
+
+/* Minimal overrides for UploadThing button to match our theme */
+[data-ut-element="button"] {
+  background: var(--fg) !important;
+  color: var(--page-bg) !important;
+}
+[data-ut-element="button"] * {
+  color: inherit;
+}
+[data-ut-element="button"]:hover:not([data-state="uploading"]) {
+  opacity: 0.9;
+}
+[data-ut-element="button"][data-state="uploading"] {
+  opacity: 0.85;
+  cursor: not-allowed;
+}
+
+/* Ensure button label stays above progress bar and is visible */
+[data-ut-element="button"] > span {
+  position: relative;
+  z-index: 10;
+}
+
+/* Subtle fade-in for success/error messages */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out forwards;
 }
