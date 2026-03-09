@@ -3,6 +3,7 @@
 import { UploadButton } from "@/app/utils/uploadthing";
 import { useState } from "react";
 import type { UploadThingError } from "@uploadthing/shared";
+import { addToHistory } from "@/app/utils/history";
 
 const SITE_NAME = "fupload";
 const TAGLINE = "Drop a file. Get a shareable link.";
@@ -49,12 +50,14 @@ export default function Home() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleUploadComplete = (res: { ufsUrl?: string }[] | undefined) => {
+  const handleUploadComplete = (res: { ufsUrl?: string; name?: string }[] | undefined) => {
     setError(null);
-    if (res?.[0]?.ufsUrl) {
-      setUrl(res[0].ufsUrl);
+    const file = res?.[0];
+    if (file?.ufsUrl) {
+      setUrl(file.ufsUrl);
       setJustUploaded(true);
       setTimeout(() => setJustUploaded(false), 2400);
+      addToHistory(file.ufsUrl, file.name ?? "Untitled");
     }
   };
 
@@ -146,6 +149,15 @@ export default function Home() {
             <p className="mt-3 text-[11px] text-[var(--muted)] animate-fade-in">
               Done. Copy the link above to share.
             </p>
+          )}
+
+          {!url && !error && (
+            <a
+              href="/history"
+              className="mt-6 text-[12px] text-[var(--muted)] hover:text-[var(--fg)] transition-colors"
+            >
+              View upload history
+            </a>
           )}
         </div>
       </div>
