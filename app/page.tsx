@@ -80,9 +80,9 @@ export default function Home() {
 
   return (
     <main className="min-h-screen flex flex-col bg-[var(--page-bg)]">
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-12 sm:py-16">
-        <header className="w-full max-w-[420px] text-center mb-10">
-          <h1 className="font-pixel text-[80px] sm:text-[112px] font-medium text-[var(--fg)] tracking-tight mb-2">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-16">
+        <header className="w-full max-w-[420px] text-center mb-8 sm:mb-10">
+          <h1 className="font-pixel text-[48px] sm:text-[80px] md:text-[112px] font-medium text-[var(--fg)] tracking-tight mb-2 leading-none">
             {SITE_NAME}
           </h1>
           <p className="text-[13px] text-[var(--muted)] leading-relaxed">
@@ -91,7 +91,7 @@ export default function Home() {
         </header>
 
         <div className="w-full max-w-[420px] flex flex-col items-center">
-          <div className="w-full rounded-xl border border-[var(--border)] bg-[var(--card)] p-8 sm:p-10 flex flex-col items-center justify-center min-h-[160px] transition-colors">
+          <div className="w-full rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 sm:p-10 flex flex-col items-center justify-center min-h-[140px] sm:min-h-[160px] transition-colors">
             <UploadButton
               endpoint="fileUploader"
               appearance={{
@@ -133,7 +133,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={copy}
-                className="text-[12px] font-medium text-[var(--fg)] flex-shrink-0 py-1 px-2 -mr-1 rounded hover:bg-[var(--border)]/50 transition-colors focus:outline-none focus:ring-1 focus:ring-[var(--fg)]/20"
+                className="text-[12px] font-medium text-[var(--fg)] flex-shrink-0 py-2 px-3 min-h-[44px] min-w-[60px] flex items-center justify-center rounded hover:bg-[var(--border)]/50 active:bg-[var(--border)] transition-colors focus:outline-none focus:ring-1 focus:ring-[var(--fg)]/20"
               >
                 {copied ? "Copied" : "Copy"}
               </button>
@@ -148,7 +148,7 @@ export default function Home() {
         </div>
       </div>
 
-      <footer className="py-6 text-center">
+      <footer className="py-6 px-4 text-center pb-[max(1.5rem,env(safe-area-inset-bottom))]">
         <span className="text-[11px] text-[var(--muted)]">
           powered by{" "}
           <a

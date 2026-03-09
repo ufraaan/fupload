@@ -14,6 +14,7 @@ body {
   background: var(--page-bg);
   color: var(--fg);
   font-family: var(--font-mono);
+  overflow-x: hidden;
 }
 
 .font-pixel {

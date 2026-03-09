@@ -13,6 +13,12 @@ export const metadata = {
     "Upload a file and get a shareable link instantly. No sign-up. Images, PDFs, video, audio, and more.",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export default function RootLayout({
   children,
 }: {
