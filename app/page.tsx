@@ -79,10 +79,10 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col bg-[var(--page-bg)]">
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-16">
-        <header className="w-full max-w-[420px] text-center mb-8 sm:mb-10">
-          <h1 className="font-pixel text-[48px] sm:text-[80px] md:text-[112px] font-medium text-[var(--fg)] tracking-tight mb-2 leading-none">
+    <main className="h-screen sm:min-h-screen flex flex-col bg-[var(--page-bg)] overflow-hidden sm:overflow-auto">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-6 sm:py-16">
+        <header className="w-full max-w-[420px] text-center mb-6 sm:mb-10">
+          <h1 className="font-pixel text-[40px] sm:text-[80px] md:text-[112px] font-medium text-[var(--fg)] tracking-tight mb-2 leading-none">
             {SITE_NAME}
           </h1>
           <p className="text-[13px] text-[var(--muted)] leading-relaxed">
@@ -90,7 +90,7 @@ export default function Home() {
           </p>
         </header>
 
-        <div className="w-full max-w-[420px] flex flex-col items-center">
+          <div className="w-full max-w-[420px] flex flex-col items-center mb-6">
           <div className="w-full rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 sm:p-10 flex flex-col items-center justify-center min-h-[140px] sm:min-h-[160px] transition-colors">
             <UploadButton
               endpoint="fileUploader"
