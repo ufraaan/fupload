@@ -1,54 +1,137 @@
 @import "tailwindcss";
-@import "@uploadthing/react/styles.css";
 
 :root {
-  --page-bg: #fafafa;
+  color-scheme: light;
+  --page-bg: #ffffff;
   --card: #ffffff;
   --fg: #0a0a0a;
-  --muted: #737373;
+  --muted: #666666;
   --border: #e5e5e5;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --hover: #f7f7f7;
+  --control-bg: #ffffff;
+  --control-active: #f0f0f0;
+  --danger: #dc2626;
+  --danger-bg: #fef2f2;
+  --selection-bg: #d4d4d4;
+  --font-sans: var(--font-geist-sans), Geist, Arial, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --page-bg: #0a0a0a;
+    --card: #111111;
+    --fg: #ededed;
+    --muted: #a1a1a1;
+    --border: #2a2a2a;
+    --hover: #171717;
+    --control-bg: #111111;
+    --control-active: #202020;
+    --danger: #f87171;
+    --danger-bg: #2b1212;
+    --selection-bg: #404040;
+  }
 }
 
 body {
   background: var(--page-bg);
   color: var(--fg);
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   overflow-x: hidden;
 }
 
-.font-pixel {
-  font-family: var(--font-geist-pixel-line), var(--font-mono);
+@media (horizontal-viewport-segments: 2) {
+  .upload-shell {
+    display: grid;
+    grid-template-columns: env(viewport-segment-width 0 0) env(viewport-segment-width 1 0);
+    column-gap: calc(env(viewport-segment-left 1 0) - env(viewport-segment-right 0 0));
+    padding-inline: 0;
+  }
+
+  .upload-content {
+    grid-column: 1;
+    width: min(100%, 25rem);
+    align-self: stretch;
+    padding-inline: max(1.25rem, env(safe-area-inset-left));
+  }
 }
 
-[data-ut-element="button"] {
-  background: var(--fg) !important;
-  color: var(--page-bg) !important;
-}
-[data-ut-element="button"] * {
-  color: inherit;
-}
-[data-ut-element="button"]:hover:not([data-state="uploading"]) {
-  opacity: 0.9;
-}
-[data-ut-element="button"][data-state="uploading"] {
-  opacity: 0.85;
-  cursor: not-allowed;
+@media (vertical-viewport-segments: 2) {
+  .upload-shell {
+    display: grid;
+    grid-template-rows: env(viewport-segment-height 0 0) env(viewport-segment-height 0 1);
+    row-gap: calc(env(viewport-segment-top 0 1) - env(viewport-segment-bottom 0 0));
+    padding-block: 0;
+  }
+
+  .upload-content {
+    grid-row: 1;
+    width: min(100%, 25rem);
+    align-self: stretch;
+    padding-block: 1.5rem;
+  }
 }
 
-[data-ut-element="button"] > span {
+::selection { background: var(--selection-bg); color: var(--fg); }
+
+.copy-icon-wrap {
   position: relative;
-  z-index: 10;
+  display: block;
+  width: 15px;
+  height: 15px;
 }
 
-[data-ut-element="button"][data-state="uploading"]::after {
-  background: #ff0000 !important;
+.copy-icon {
+  position: absolute;
+  inset: 0;
+  opacity: 1;
+  transform: scale(1) rotate(0);
+  transition: opacity 180ms ease, transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.copy-icon--hidden {
+  opacity: 0;
+  transform: scale(0.7) rotate(-35deg);
 }
-.animate-fade-in {
-  animation: fadeIn 0.2s ease-out forwards;
+
+.copy-icon--check {
+  opacity: 0;
+  transform: scale(0.7) rotate(35deg);
+}
+
+.copy-icon--check.copy-icon--visible {
+  opacity: 1;
+  transform: scale(1) rotate(0);
+}
+
+.entrance-header,
+.entrance-main,
+.entrance-footer {
+  animation: entrance-fade 380ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.entrance-main { animation-delay: 45ms; }
+.entrance-footer { animation-delay: 90ms; }
+
+@keyframes entrance-fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes upload-indeterminate {
+  from { transform: translateX(-110%); }
+  to { transform: translateX(330%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

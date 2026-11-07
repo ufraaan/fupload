@@ -1,16 +1,16 @@
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { extractRouterConfig } from "uploadthing/server";
 import { ourFileRouter } from "@/app/api/uploadthing/core";
-import { GeistMono } from "geist/font/mono";
-import { GeistPixelLine } from "geist/font/pixel";
+import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 
-const fontVariables = [GeistMono.variable, GeistPixelLine.variable].join(" ");
-
 export const metadata = {
-  title: "Fupload",
+  title: "fupload",
   description:
-    "Upload a file and get a shareable link instantly.",
+    "upload a file and get a shareable link instantly.",
+  icons: {
+    icon: [{ url: "/fupload-icon.svg", type: "image/svg+xml" }],
+  },
 };
 
 export const viewport = {
@@ -25,8 +25,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={fontVariables}>
-      <body className="antialiased font-mono">
+    <html lang="en" className={GeistSans.variable}>
+      <body className="antialiased font-sans">
         <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
         {children}
       </body>
