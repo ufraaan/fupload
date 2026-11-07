@@ -8,6 +8,32 @@ import { addToHistory } from "@/app/utils/history";
 import { getFileLimitError } from "@/app/utils/file-validation";
 
 type Toast = { kind: "success" | "error"; message: string };
+type OutputFormat = "url" | "markdown" | "html";
+
+function escapeHtml(value: string): string {
+  const entities: Record<string, string> = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  return value.replace(/[&<>"']/g, (character) => entities[character]);
+}
+
+function getFormattedOutput(url: string, filename: string, format: OutputFormat): string {
+  if (format === "url") return url;
+
+  const isImage = /\.(apng|avif|bmp|gif|jpe?g|png|svg|tiff?|webp)$/i.test(filename);
+  if (format === "markdown") {
+    const alt = filename.replace(/[\\[\]]/g, "\\$&");
+    return isImage ? `![${alt}](<${url}>)` : `[${alt}](<${url}>)`;
+  }
+
+  return isImage
+    ? `<img src="${escapeHtml(url)}" alt="${escapeHtml(filename)}" />`
+    : `<a href="${escapeHtml(url)}">${escapeHtml(filename)}</a>`;
+}
 
 function friendlyError(raw: string): string {
   const lower = raw.toLowerCase();
@@ -20,6 +46,8 @@ function friendlyError(raw: string): string {
 
 export default function Home() {
   const [url, setUrl] = useState("");
+  const [fileName, setFileName] = useState("file");
+  const [outputFormat, setOutputFormat] = useState<OutputFormat>("url");
   const [copied, setCopied] = useState(false);
   const [toast, setToast] = useState<Toast | null>(null);
   const [progress, setProgress] = useState<number | null>(null);
@@ -41,6 +69,7 @@ export default function Home() {
       setProgress(null);
       if (!file?.ufsUrl) return;
       setUrl(file.ufsUrl);
+      setFileName(file.name ?? "file");
       addToHistory(file.ufsUrl, file.name ?? "Untitled");
     },
     onUploadError: (err: UploadThingError<{ message?: string }>) => {
@@ -60,12 +89,62 @@ export default function Home() {
     setToast(null);
     if (toastTimeout.current !== null) window.clearTimeout(toastTimeout.current);
     setUrl("");
+    setFileName(file.name || "file");
+    setOutputFormat("url");
+    setCopied(false);
     setProgress(null);
     void startUpload([files[0]]).catch((err: unknown) => {
       setProgress(null);
       showToast(friendlyError(err instanceof Error ? err.message : "upload failed."), "error");
     });
   }, [isUploading, showToast, startUpload]);
+
+  useEffect(() => {
+    let dragDepth = 0;
+
+    const isFileDrag = (event: DragEvent) => Array.from(event.dataTransfer?.types ?? []).includes("Files");
+    const onDragEnter = (event: DragEvent) => {
+      if (!isFileDrag(event)) return;
+      event.preventDefault();
+      dragDepth += 1;
+      setDragging(true);
+    };
+    const onDragOver = (event: DragEvent) => {
+      if (!isFileDrag(event)) return;
+      event.preventDefault();
+      if (event.dataTransfer) event.dataTransfer.dropEffect = "copy";
+      setDragging(true);
+    };
+    const onDragLeave = (event: DragEvent) => {
+      if (!isFileDrag(event)) return;
+      dragDepth = Math.max(0, dragDepth - 1);
+      if (dragDepth === 0) setDragging(false);
+    };
+    const onDrop = (event: DragEvent) => {
+      if (!isFileDrag(event)) return;
+      event.preventDefault();
+      dragDepth = 0;
+      setDragging(false);
+      upload(Array.from(event.dataTransfer?.files ?? []));
+    };
+    const onDragEnd = () => {
+      dragDepth = 0;
+      setDragging(false);
+    };
+
+    window.addEventListener("dragenter", onDragEnter);
+    window.addEventListener("dragover", onDragOver);
+    window.addEventListener("dragleave", onDragLeave);
+    window.addEventListener("drop", onDrop);
+    window.addEventListener("dragend", onDragEnd);
+    return () => {
+      window.removeEventListener("dragenter", onDragEnter);
+      window.removeEventListener("dragover", onDragOver);
+      window.removeEventListener("dragleave", onDragLeave);
+      window.removeEventListener("drop", onDrop);
+      window.removeEventListener("dragend", onDragEnd);
+    };
+  }, [upload]);
 
   useEffect(() => {
     const onPaste = (event: ClipboardEvent) => {
@@ -88,12 +167,18 @@ export default function Home() {
 
   const copy = async () => {
     if (!url) return;
-    await navigator.clipboard.writeText(url);
-    setCopied(true);
-    if (copyTimeout.current !== null) window.clearTimeout(copyTimeout.current);
-    copyTimeout.current = window.setTimeout(() => setCopied(false), 2000);
-    showToast("copied!", "success", 2000);
+    try {
+      await navigator.clipboard.writeText(getFormattedOutput(url, fileName, outputFormat));
+      setCopied(true);
+      if (copyTimeout.current !== null) window.clearTimeout(copyTimeout.current);
+      copyTimeout.current = window.setTimeout(() => setCopied(false), 2000);
+      showToast(`copied ${outputFormat === "url" ? "link" : outputFormat}!`, "success", 2000);
+    } catch {
+      showToast("couldn't copy. try again.", "error");
+    }
   };
+
+  const formattedOutput = url ? getFormattedOutput(url, fileName, outputFormat) : "";
 
   return (
     <main className="upload-shell flex min-h-screen min-h-[100svh] flex-col bg-[var(--page-bg)] px-5 py-6 sm:py-8">
@@ -111,12 +196,7 @@ export default function Home() {
         <div className="entrance-main my-auto w-full py-6">
           <h1 className="mb-6 text-center text-[21px] font-medium tracking-[-0.04em]">upload a file, get a link</h1>
 
-          <section
-            onDragOver={(event) => { event.preventDefault(); setDragging(true); }}
-            onDragLeave={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setDragging(false); }}
-            onDrop={(event) => { event.preventDefault(); setDragging(false); upload(Array.from(event.dataTransfer.files)); }}
-            className={`rounded-md border border-dashed px-4 py-5 text-center transition-[border-color,background-color] duration-150 ${dragging ? "border-[var(--fg)] bg-[var(--hover)]" : "border-[var(--border)]"}`}
-          >
+          <section className="rounded-md border border-dashed border-[var(--border)] px-4 py-5 text-center transition-colors duration-150">
             <p className="text-[13px] font-medium">drop or paste a file</p>
             <div className="mt-4 flex justify-center">
               <input ref={fileInput} type="file" className="sr-only" disabled={isUploading} onChange={(event) => { upload(Array.from(event.currentTarget.files ?? [])); event.currentTarget.value = ""; }} />
@@ -155,10 +235,29 @@ export default function Home() {
           )}
           {url && (
             <div className="mt-5 min-w-0 animate-[fade-in_160ms_ease-out]">
-              <label className="mb-2 block text-[12px] font-medium text-[var(--fg)]" htmlFor="share-link">your link</label>
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <span className="text-[12px] font-medium text-[var(--fg)]">your link</span>
+                <label className="flex shrink-0 items-center gap-2 text-[11px] text-[var(--muted)]">
+                  <span>format</span>
+                  <select
+                    aria-label="link format"
+                    value={outputFormat}
+                    onChange={(event) => setOutputFormat(event.target.value as OutputFormat)}
+                    className="cursor-pointer rounded border border-[var(--border)] bg-[var(--control-bg)] py-1 pl-2 pr-6 text-[11px] text-[var(--fg)] outline-none transition-colors hover:bg-[var(--hover)] focus-visible:outline-2 focus-visible:outline-offset-2"
+                  >
+                    <option value="url">url</option>
+                    <option value="markdown">markdown</option>
+                    <option value="html">html</option>
+                  </select>
+                </label>
+              </div>
               <div className="flex min-w-0 items-center gap-2 rounded-md border border-[var(--border)] bg-[var(--card)] p-1.5 pl-3">
-                <a id="share-link" href={url} target="_blank" rel="noopener noreferrer" className="min-w-0 flex-1 truncate text-[12px] text-[var(--muted)] underline decoration-transparent underline-offset-2 transition-colors hover:text-[var(--fg)] hover:decoration-current" title={url}>{url}</a>
-                <button type="button" onClick={copy} aria-label={copied ? "copied link" : "copy link"} title={copied ? "copied" : "copy link"} className="flex size-8 shrink-0 cursor-copy items-center justify-center rounded border border-[var(--border)] bg-[var(--control-bg)] text-[var(--fg)] transition-colors hover:bg-[var(--hover)] active:bg-[var(--control-active)] focus-visible:outline-2 focus-visible:outline-offset-2">
+                {outputFormat === "url" ? (
+                  <a href={url} target="_blank" rel="noopener noreferrer" className="min-w-0 flex-1 truncate text-[12px] text-[var(--muted)] underline decoration-transparent underline-offset-2 transition-colors hover:text-[var(--fg)] hover:decoration-current" title={url}>{url}</a>
+                ) : (
+                  <code className="min-w-0 flex-1 truncate text-[11px] text-[var(--muted)]" title={formattedOutput}>{formattedOutput}</code>
+                )}
+                <button type="button" onClick={copy} aria-label={`${copied ? "copied" : "copy"} ${outputFormat === "url" ? "link" : outputFormat}`} title={copied ? "copied" : `copy ${outputFormat === "url" ? "link" : outputFormat}`} className="flex size-8 shrink-0 cursor-copy items-center justify-center rounded border border-[var(--border)] bg-[var(--control-bg)] text-[var(--fg)] transition-colors hover:bg-[var(--hover)] active:bg-[var(--control-active)] focus-visible:outline-2 focus-visible:outline-offset-2">
                   <span className="copy-icon-wrap" aria-hidden="true">
                     <svg className={`copy-icon ${copied ? "copy-icon--hidden" : ""}`} width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M1 9.50006C1 10.3285 1.67157 11.0001 2.5 11.0001H4L4 10.0001H2.5C2.22386 10.0001 2 9.7762 2 9.50006L2 2.50006C2 2.22392 2.22386 2.00006 2.5 2.00006L9.5 2.00006C9.77614 2.00006 10 2.22392 10 2.50006V4.00002H5.5C4.67158 4.00002 4 4.67159 4 5.50002V12.5C4 13.3284 4.67158 14 5.5 14H12.5C13.3284 14 14 13.3284 14 12.5V5.50002C14 4.67159 13.3284 4.00002 12.5 4.00002H11V2.50006C11 1.67163 10.3284 1.00006 9.5 1.00006H2.5C1.67157 1.00006 1 1.67163 1 2.50006V9.50006ZM5 5.50002C5 5.22388 5.22386 5.00002 5.5 5.00002H12.5C12.7761 5.00002 13 5.22388 13 5.50002V12.5C13 12.7762 12.7761 13 12.5 13H5.5C5.22386 13 5 12.7762 5 12.5V5.50002Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd" />
@@ -189,6 +288,11 @@ export default function Home() {
           </p>
         </footer>
       </div>
+      {dragging && (
+        <div className="pointer-events-none fixed inset-3 z-40 flex items-center justify-center rounded-lg border border-dashed border-[#0d6efd]/50 bg-[var(--page-bg)]/90 text-[13px] font-medium text-[var(--fg)] animate-[fade-in_120ms_ease-out]" aria-hidden="true">
+          drop to upload
+        </div>
+      )}
       <div data-testid="toast" className={`fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] right-[calc(1rem+env(safe-area-inset-right))] z-50 max-w-[calc(100vw-2rem)] rounded-md border px-3 py-2 text-[12px] shadow-lg transition-[opacity,transform] duration-200 ${toast?.kind === "error" ? "border-[var(--danger)]/30 bg-[var(--danger-bg)] text-[var(--danger)]" : "border-[var(--border)] bg-[var(--card)] text-[var(--fg)]"} ${toast ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-1 opacity-0"}`} role={toast?.kind === "error" ? "alert" : "status"} aria-live={toast?.kind === "error" ? "assertive" : "polite"} aria-atomic="true">
         {toast?.message ?? ""}
       </div>
