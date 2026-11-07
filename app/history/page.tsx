@@ -23,7 +23,7 @@ function Preview({ url, filename }: { url: string; filename: string }) {
   }
   return (
     <div className="w-12 h-12 rounded border border-[var(--border)] bg-[var(--page-bg)] flex items-center justify-center">
-      <span className="text-[10px] text-[var(--muted)] uppercase">
+      <span className="text-[10px] text-[var(--muted)] lowercase">
         {filename.slice(filename.lastIndexOf(".") + 1).slice(0, 3)}
       </span>
     </div>
@@ -56,22 +56,22 @@ export default function History() {
   };
 
   const formatDate = (ts: number) => {
-    return new Date(ts).toLocaleString();
+    return new Date(ts).toLocaleString().toLowerCase();
   };
 
   return (
     <main className="min-h-screen flex flex-col bg-[var(--page-bg)]">
       <header className="py-8 px-4 text-center border-b border-[var(--border)]">
-        <h1 className="font-pixel text-[32px] sm:text-[48px] text-[var(--fg)]">History</h1>
-        <p className="text-[13px] text-[var(--muted)] mt-1">Stored locally in your browser</p>
+        <h1 className="text-[28px] font-medium tracking-[-0.04em] text-[var(--fg)] sm:text-[32px]">history</h1>
+        <p className="text-[13px] text-[var(--muted)] mt-1">stored locally in your browser</p>
       </header>
 
       <div className="flex-1 px-4 py-6 max-w-[600px] mx-auto w-full">
         {records.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-[14px] text-[var(--muted)]">No uploads yet</p>
-            <Link href="/" className="text-[13px] text-red-500 hover:underline mt-2 inline-block">
-              Go to upload
+            <p className="text-[14px] text-[var(--muted)]">no uploads yet</p>
+            <Link href="/" className="mt-2 inline-block text-[13px] text-[var(--danger)] hover:underline">
+              go to upload
             </Link>
           </div>
         ) : (
@@ -79,9 +79,9 @@ export default function History() {
             <div className="flex justify-end mb-4">
               <button
                 onClick={clear}
-                className="text-[12px] text-[var(--muted)] hover:text-red-500 transition-colors"
+                className="text-[12px] text-[var(--muted)] transition-colors hover:text-[var(--danger)]"
               >
-                Clear all
+                clear all
               </button>
             </div>
 
@@ -111,13 +111,13 @@ export default function History() {
                         onClick={() => copy(record.url)}
                         className="text-[11px] px-3 py-1.5 rounded border border-[var(--border)] bg-[var(--page-bg)] hover:bg-[var(--border)]/50 transition-colors"
                       >
-                        {copied === record.url ? "Copied" : "Copy"}
+                        {copied === record.url ? "copied" : "copy"}
                       </button>
                       <button
                         onClick={() => remove(record.url)}
-                        className="text-[11px] px-3 py-1.5 rounded border border-red-200/50 text-red-600 hover:bg-red-50 dark:border-red-900/30 dark:hover:bg-red-950/30 transition-colors"
+                        className="rounded border border-[var(--border)] px-3 py-1.5 text-[11px] text-[var(--danger)] transition-colors hover:bg-[var(--danger-bg)]"
                       >
-                        Delete
+                        delete
                       </button>
                     </div>
                   </div>
@@ -130,7 +130,7 @@ export default function History() {
 
       <footer className="py-6 px-4 text-center">
         <Link href="/" className="text-[12px] text-[var(--muted)] hover:underline">
-          ← Back to upload
+          ← back to upload
         </Link>
       </footer>
     </main>
